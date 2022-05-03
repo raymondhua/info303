@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>TODO supply a title</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	</head>
-	<body>
-      <div>TODO write content</div>
-	</body>
+    <head>
+        <title>Add Customer</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/external/vue.global.js"></script>
+        <script src="js/external/axios.js"></script>
+    </head>
+    <body>
+    <main>
+        <h1>Add a New Customer</h1>
+        <fieldset>
+            <legend>Customer Details</legend>
+            <form @submit.prevent="addCustomer()">
+                <label>Email:</label><input type="text" v-model="customer.email">
+                <label>First name:</label><input type="text" v-model="customer.firstName">
+                <label>Last name:</label><input type="text" v-model="customer.lastName">
+                <button>Add New Customer</button>
+            </form>
+        </fieldset>
+    </main>
+    <script type="module" src="js/customer.js"></script>
+    </body>
 </html>
