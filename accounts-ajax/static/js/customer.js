@@ -1,4 +1,6 @@
-var customerApi = '//localhost:9000/addAccount';
+/* global Vue, axios */
+
+var customerApi = '//localhost:9000/addCustomer';
 const app = Vue.createApp({
  
     data() {
@@ -16,7 +18,7 @@ const app = Vue.createApp({
     addCustomer() {
         axios.post(customerApi, this.customer)
             .then(() => {
-                // update the catalogue
+                alert("Customer has been added");
             })
             .catch(error => {
                 console.error(error);

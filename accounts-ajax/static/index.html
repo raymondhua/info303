@@ -13,6 +13,7 @@
         <fieldset>
             <legend>Customer Details</legend>
             <form @submit.prevent="addCustomer()">
+                <label>Username:</label><input type="text" v-model="customer.username">
                 <label>Email:</label><input type="text" v-model="customer.email">
                 <label>First name:</label><input type="text" v-model="customer.firstName">
                 <label>Last name:</label><input type="text" v-model="customer.lastName">
