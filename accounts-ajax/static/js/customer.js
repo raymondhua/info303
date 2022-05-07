@@ -1,6 +1,6 @@
 /* global Vue, axios */
 
-var customerApi = '//localhost:9000/addCustomer';
+var customerApi = '//localhost:9000/createCustomer';
 const app = Vue.createApp({
  
     data() {
@@ -15,10 +15,10 @@ const app = Vue.createApp({
  
     methods: {
     
-    addCustomer() {
+    createCustomer() {
         axios.post(customerApi, this.customer)
             .then(() => {
-                alert("Customer has been added");
+                alert("Customer has been created");
             })
             .catch(error => {
                 console.error(error);
