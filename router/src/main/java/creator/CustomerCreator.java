@@ -19,6 +19,7 @@ public class CustomerCreator {
         customer.setCustomerCode(account.getUsername());
         customer.setEmail(account.getEmail());
         customer.setGroup("0afa8de1-147c-11e8-edec-2b197906d816");
+        //customer.setId("hh"); //comment this out later
         return customer;
     }
 }
