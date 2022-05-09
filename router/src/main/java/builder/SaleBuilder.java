@@ -33,9 +33,16 @@ public class SaleBuilder extends RouteBuilder {
         .setHeader(Exchange.HTTP_METHOD, constant("POST"))
         .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
         .to("http://localhost:8083/api/sales")
-        .to("jms:queue:get-customer-summary");
+        .to("jms:queue:customer-summary");
        
-
+        from("jms:queue:customer-summary")
+          .removeHeaders("*") // remove headers to stop them being sent to the service
+          .setBody(constant((Object) null)) // doesn't usually make sense to pass a body in a GET request
+          .setHeader(Exchange.HTTP_METHOD, constant("GET"))
+          .log("Customer ID: ${exchangeProperty.customerID}")
+          .toD("http://localhost:8083/api/sales/customer/${exchangeProperty.customerID}/summary")
+          .to("jms:queue:summary-response");
+        
    }
 
 }
