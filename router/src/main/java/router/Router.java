@@ -1,6 +1,7 @@
 package router;
 
-import builder.AddCustomerBuilder;
+import builder.CustomerBuilder;
+import builder.SaleBuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -16,7 +17,7 @@ public class Router {
         camel.addComponent("jms", activemq);
 
         // transfer the entire exchange, or just the body and headers?
-        activemq.setTransferExchange(false);
+        activemq.setTransferExchange(true);
 
         // trust all classes being used to send serialised domain objects
         activemq.setTrustAllPackages(true);
@@ -27,7 +28,8 @@ public class Router {
         // enable stream caching so that things like loggers don't consume the messages
         camel.setStreamCaching(true);
         // create and add the builder(s)
-        camel.addRoutes(new AddCustomerBuilder());
+        camel.addRoutes(new CustomerBuilder());
+        camel.addRoutes(new SaleBuilder());
         // start routing
         System.out.println("Starting router...");
         camel.start();

@@ -16,7 +16,7 @@ import org.apache.camel.model.dataformat.JsonLibrary;
  *
  * @author raymondhua
  */
-public class AddCustomerBuilder extends RouteBuilder {
+public class CustomerBuilder extends RouteBuilder {
    @Override
    public void configure()  { 
     from("jetty:http://localhost:9000/createCustomer?enableCORS=true")
