@@ -68,13 +68,14 @@ public class SaleBuilder extends RouteBuilder {
         .to("jms:queue:graphql-update-group", "jms:queue:vend-update-group"); 
 
     from("jms:queue:graphql-update-group")
-        .log("Extracted: ${body}")
+        .log("Updating the group in the Account service for customer ID: ${body.id}")
         .toD("graphql://http://localhost:8082/graphql?query=mutation{changeGroup(id: \"${body.id}\", newGroup: \"${body.group}\") "
                 + "{id, email, username, firstName, lastName, group}}")
         .log("Group updated in the Accounts service")
         .to("jms:queue:graphql-update-group-response");
        
     from("jms:queue:vend-update-group")
+        .log("Updating the group Vend for customer ID: ${body.id}")
         .removeHeaders("*")
         .setHeader("Authorization", constant("Bearer KiQSsELLtocyS2WDN5w5s_jYaBpXa0h2ex1mep1a"))
         .marshal().json(JsonLibrary.Gson)

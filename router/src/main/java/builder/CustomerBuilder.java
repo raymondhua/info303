@@ -60,7 +60,7 @@ public class CustomerBuilder extends RouteBuilder {
                 + "{id: \"${body.id}\", email: \"${body.email}\", username: \"${body.customerCode}\", "
                 + "firstName: \"${body.firstName}\", lastName: \"${body.lastName}\", group: \"${body.group}\"}) "
                 + "{id,email,username,firstName,lastName,group}}")
-        .log("Added new customer into the Accounts service")
+        .log("Customer added into the Accounts service")
         .to("jms:queue:graphql-create-customer-response");
         
    }
