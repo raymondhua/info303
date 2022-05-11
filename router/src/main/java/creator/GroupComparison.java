@@ -11,7 +11,7 @@ import domain.Summary;
  *
  * @author raymondhua
  */
-public class CompareGroup {
+public class GroupComparison {
     public Customer compare(Summary summary){
         Customer customer = new Customer();
         if(summary.getGroup().equals("Regular Customers")){

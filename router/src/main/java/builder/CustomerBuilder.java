@@ -5,6 +5,7 @@
 package builder;
 
 import creator.CustomerCreator;
+import creator.Converter;
 import domain.Account;
 import domain.Customer;
 import org.apache.camel.Exchange;
@@ -25,9 +26,9 @@ public class CustomerBuilder extends RouteBuilder {
         .unmarshal().json(JsonLibrary.Gson, Account.class)
         .bean(CustomerCreator.class, "add(${body})")
         .log("Customer: ${body}")
-        .to("jms:queue:send-to-vend");
+        .to("jms:queue:vend-create-customer");
  
-    from("jms:queue:send-to-vend")
+    from("jms:queue:vend-create-customer")
         .removeHeaders("*")
         .setHeader("Authorization", constant("Bearer KiQSsELLtocyS2WDN5w5s_jYaBpXa0h2ex1mep1a"))
         .marshal().json(JsonLibrary.Gson)
@@ -37,22 +38,25 @@ public class CustomerBuilder extends RouteBuilder {
         .choice()
           .when().simple("${header.CamelHttpResponseCode} == '201'")
              .convertBodyTo(String.class)
-             .to("jms:queue:vend-response")
+             .to("jms:queue:vend-create-customer-response")
           .otherwise()
             .convertBodyTo(String.class)
-            .to("jms:queue:vend-error")
-          .endChoice();
+            .to("jms:queue:vend-create-customer-error");
     
-    from("jms:queue:vend-response")
+    from("jms:queue:vend-create-customer-response")
         .setBody().jsonpath("$.data")
         .marshal().json(JsonLibrary.Gson)
         .unmarshal().json(JsonLibrary.Gson, Customer.class)
-        .log("Customer: ${body}")
-        .to("jms:queue:create-customer-graphql");
+        //.bean(Converter.class, "convertToAccount(${body})")
+        .to("jms:queue:graphql-create-customer");
     
-    from("jms:queue:create-customer-graphql")
-	.toD("graphql://http://localhost:8082/graphql?query=mutation{addAccount(account: {id: \"${body.id}\", email: \"${body.email}\", username: \"${body.customerCode}\", firstName: \"${body.firstName}\", lastName: \"${body.lastName}\", group: \"${body.group}\"}) {id,email,username,firstName,lastName,group}}")
-        .log("GraphQL service called");
+    from("jms:queue:graphql-create-customer")
+	.toD("graphql://http://localhost:8082/graphql?query=mutation{addAccount(account: "
+                + "{id: \"${body.id}\", email: \"${body.email}\", username: \"${body.customerCode}\", "
+                + "firstName: \"${body.firstName}\", lastName: \"${body.lastName}\", group: \"${body.group}\"}) "
+                + "{id,email,username,firstName,lastName,group}}")
+        .log("GraphQL service called")
+        .to("jms:queue:graphql-create-customer-response");
         
    }
 
