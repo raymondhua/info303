@@ -20,7 +20,7 @@ public class SaleBuilder extends RouteBuilder {
    public void configure()  { 
     from("jms:queue:new-sale")
         .unmarshal().json(JsonLibrary.Gson, Sale.class)
-        .log("New sale from Vend: ${body.id}")
+        .log("New sale from Vend. Sale ID: ${body.id}")
         .setProperty("customerID").simple("${body.customer.id}")
         .setProperty("customerFirstName").simple("${body.customer.firstName}")
         .setProperty("customerLastName").simple("${body.customer.lastName}") 
@@ -35,7 +35,7 @@ public class SaleBuilder extends RouteBuilder {
         .setHeader(Exchange.HTTP_METHOD, constant("POST"))
         .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
         .to("http://localhost:8083/api/sales")
-        .log("Sale added into the local service")
+        .log("Sale added into the sales service")
         .to("jms:queue:customer-summary");
 
     from("jms:queue:customer-summary")
@@ -84,7 +84,7 @@ public class SaleBuilder extends RouteBuilder {
         .choice()
             .when().simple("${header.CamelHttpResponseCode} == '200'")
                 .convertBodyTo(String.class)
-                .log("Group updated in the Vend")
+                .log("Group updated in Vend")
                 .to("jms:queue:vend-update-group-response")
             .otherwise()
                 .convertBodyTo(String.class)

@@ -25,7 +25,8 @@ public class CustomerBuilder extends RouteBuilder {
         .convertBodyTo(String.class)
         .unmarshal().json(JsonLibrary.Gson, Account.class)
         .bean(CustomerCreator.class, "add(${body})")
-        .log("Customer: ${body}")
+        .log("New customer")
+        .log("Username: ${body.customerCode}")
         .to("jms:queue:vend-create-customer");
  
     from("jms:queue:vend-create-customer")
@@ -37,16 +38,20 @@ public class CustomerBuilder extends RouteBuilder {
         .to("https://info303otago.vendhq.com/api/2.0/customers?throwExceptionOnFailure=false")
         .choice()
           .when().simple("${header.CamelHttpResponseCode} == '201'")
-             .convertBodyTo(String.class)
-             .to("jms:queue:vend-create-customer-response")
+            .convertBodyTo(String.class)
+            .log("Customer added into Vend")
+            .to("jms:queue:vend-create-customer-response")
           .otherwise()
             .convertBodyTo(String.class)
+            .log("Error adding customer to Vend")
             .to("jms:queue:vend-create-customer-error");
     
     from("jms:queue:vend-create-customer-response")
         .setBody().jsonpath("$.data")
         .marshal().json(JsonLibrary.Gson)
         .unmarshal().json(JsonLibrary.Gson, Customer.class)
+        .log("Adding new customer into the Accounts service.")
+        .log("Customer ID: ${body.id}")
         //.bean(Converter.class, "convertToAccount(${body})")
         .to("jms:queue:graphql-create-customer");
     
@@ -55,7 +60,7 @@ public class CustomerBuilder extends RouteBuilder {
                 + "{id: \"${body.id}\", email: \"${body.email}\", username: \"${body.customerCode}\", "
                 + "firstName: \"${body.firstName}\", lastName: \"${body.lastName}\", group: \"${body.group}\"}) "
                 + "{id,email,username,firstName,lastName,group}}")
-        .log("GraphQL service called")
+        .log("Added new customer into the Accounts service")
         .to("jms:queue:graphql-create-customer-response");
         
    }
