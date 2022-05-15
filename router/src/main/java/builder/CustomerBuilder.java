@@ -52,7 +52,6 @@ public class CustomerBuilder extends RouteBuilder {
         .unmarshal().json(JsonLibrary.Gson, Customer.class)
         .log("Adding new customer into the Accounts service.")
         .log("Customer ID: ${body.id}")
-        //.bean(Converter.class, "convertToAccount(${body})")
         .to("jms:queue:graphql-create-customer");
     
     from("jms:queue:graphql-create-customer")
@@ -60,7 +59,7 @@ public class CustomerBuilder extends RouteBuilder {
                 + "{id: \"${body.id}\", email: \"${body.email}\", username: \"${body.customerCode}\", "
                 + "firstName: \"${body.firstName}\", lastName: \"${body.lastName}\", group: \"${body.group}\"}) "
                 + "{id,email,username,firstName,lastName,group}}")
-        .log("Customer added into the Accounts service")
+        .log("Customer added into the Accounts service. Please check http://localhost:8082/")
         .to("jms:queue:graphql-create-customer-response");
         
    }
