@@ -35,7 +35,7 @@ public class SaleBuilder extends RouteBuilder {
         .setHeader(Exchange.HTTP_METHOD, constant("POST"))
         .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
         .to("http://localhost:8083/api/sales")
-        .log("Sale added into the sales service")
+        .log("Sale added into the sales service. Please check http://localhost:8083/")
         .to("jms:queue:customer-summary");
 
     from("jms:queue:customer-summary")
@@ -53,8 +53,8 @@ public class SaleBuilder extends RouteBuilder {
         .bean(GroupComparison.class, "compare(${exchangeProperty.customerID}, ${exchangeProperty.customerFirstName}, "
                 + "${exchangeProperty.customerLastName}, ${exchangeProperty.customerEmail}, "
                 + "${exchangeProperty.customerUserName}, ${body})")
-        .log("Extracted from summary: ${body.group}")
-        .log("Current group from Vend: ${exchangeProperty.customerGroup}")
+        .log("Extracted Group ID: ${body.group}")
+        .log("Current Group ID from Vend: ${exchangeProperty.customerGroup}")
         .choice()
             .when().simple("${body.group} != ${exchangeProperty.customerGroup}")
                 .log("Group needs to be updated")
@@ -71,7 +71,7 @@ public class SaleBuilder extends RouteBuilder {
         .log("Updating the group in the Account service for customer ID: ${body.id}")
         .toD("graphql://http://localhost:8082/graphql?query=mutation{changeGroup(id: \"${body.id}\", newGroup: \"${body.group}\") "
                 + "{id, email, username, firstName, lastName, group}}")
-        .log("Group updated in the Accounts service")
+        .log("Group updated in the Accounts service. Please check http://localhost:8082/")
         .to("jms:queue:graphql-update-group-response");
        
     from("jms:queue:vend-update-group")
